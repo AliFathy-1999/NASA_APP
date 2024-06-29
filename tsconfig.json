@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+      "lib": [
+        "es5",
+        "es6"
+      ],
+      "target": "ESNext",
+      "module": "NodeNext",
+      "moduleResolution": "NodeNext",
+      "outDir": "./build",
+      "esModuleInterop": true,
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+      "types": ["./src/types","./src/types/environment.d.ts","jest","./src/types/mongoose.d.ts"], 
+  }
+}
