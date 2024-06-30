@@ -8,6 +8,7 @@ const validate = (schema: { [key: string]: Schema }) => async (req:Request, res:
   ['body', 'params', 'query'].forEach((key) => {
     if (schema[key]) {
       const validation = schema[key].validate(req[key]);
+      console.log('validation:', validation)
       if (validation.error) {
         validationErr.push(validation.error);
       }

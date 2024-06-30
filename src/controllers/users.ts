@@ -9,16 +9,12 @@ import { userServices } from '../services';
 
 
 const updateUser = async (req: Request, res: Response, next: NextFunction) => {
-    const pImage = req.file ? req.file.path : undefined;
 
-    if(req.file){
-        const user = await userServices.getUserService({_id:req.user._id});
-    }
     const { firstName, lastName } = req.body;
     
     const updatedUser = await userServices.updateUserService(
         {_id:req.user._id},
-        { firstName, lastName, pImage },
+        { firstName, lastName },
         );
         if(updatedUser) infoLogger(`${req.method} | success | ${StatusCodes.OK} | ${req.protocol} | ${req.originalUrl}`)
 
@@ -34,6 +30,7 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
 
 const getUserById = async (req: Request, res: Response, next: NextFunction) => {
     const { params : { id } } = req;
+    
     const user = await userServices.getUserByIdService({ _id: id });
     if(!user) throw new ApiError (errorMsg.NotFound('User', `${id}`), StatusCodes.NOT_FOUND);
     if(user) infoLogger(`${req.method} | success | ${StatusCodes.OK} | ${req.protocol} | ${req.originalUrl}`)
