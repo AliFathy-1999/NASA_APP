@@ -26,10 +26,17 @@ interface NasaSearchParams {
     year_end?: string;
 }
 
+interface IUtilies {
+    page: string | number, 
+    limit: string | number, 
+    sort: string, 
+    select: string
+}
 
 export { 
     splitCharacterType,
     cacheOption,
     NasaEndpoint,
-    NasaSearchParams 
+    NasaSearchParams,
+    IUtilies 
 }

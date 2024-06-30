@@ -11,7 +11,6 @@ import { nasaController } from '../controllers';
 import clearCacheMW from '../middlewares/clearCache';
 
 const router = Router();
-
 router.get('/:endpoint', userAuth, validate(searchValidator),asyncWrapper(nasaController.fetchNasaDataByEndpoint))
 
 

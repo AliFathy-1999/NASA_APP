@@ -1,7 +1,12 @@
 import { Document, ObjectId } from "mongoose";
 
 interface IFavorites extends Document {
-    nasaImages: Array< { [key:string]:any }>;
+    title: string;
+    description: string,
+    photographer: string,
+    nasa_id: string
+    url:string;
+    media_type:string,
     userId: string | ObjectId;
 }
 
