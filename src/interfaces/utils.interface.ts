@@ -32,11 +32,21 @@ interface IUtilies {
     sort: string, 
     select: string
 }
-
+interface ICacheUtilies {
+    cacheFlag: cacheOption,
+    hashKey: string;
+    key: string;
+}
+interface ICacheParams {
+    key?: string;
+    hashKey?: string;
+}
 export { 
     splitCharacterType,
     cacheOption,
     NasaEndpoint,
     NasaSearchParams,
-    IUtilies 
+    IUtilies,
+    ICacheUtilies,
+    ICacheParams 
 }
