@@ -33,13 +33,15 @@ interface IUtilies {
     select: string
 }
 interface ICacheUtilies {
-    cacheFlag: cacheOption,
     hashKey: string;
     key: string;
+    cacheFlag?: cacheOption,
+    source: string
 }
 interface ICacheParams {
     key?: string;
     hashKey?: string;
+    source?: string;
 }
 export { 
     splitCharacterType,

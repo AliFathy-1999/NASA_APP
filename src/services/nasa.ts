@@ -1,7 +1,9 @@
 import axios from "axios";
-import { NasaEndpoint, NasaSearchParams } from "../interfaces/utils.interface";
+import { ICacheUtilies, NasaEndpoint, NasaSearchParams } from "../interfaces/utils.interface";
+import redisClient from "../config/redis.config";
+import util from 'util';
 
-const fetchNasaData = async (endpoint: NasaEndpoint, params: NasaSearchParams = {}) => {
+const fetchNasaData = async (endpoint: NasaEndpoint, params: NasaSearchParams = {}, cacheUtilies: ICacheUtilies) => {
     try {
         let baseUrl = process.env.NASA_URL;
         let axiosConfig = { params }
@@ -14,12 +16,26 @@ const fetchNasaData = async (endpoint: NasaEndpoint, params: NasaSearchParams = 
                     delete axiosConfig.params  
                 break;
             case 'search':
-                baseUrl += `/${endpoint}`
+                baseUrl += `/${endpoint}`;
                 break;
             default:
                 throw new Error('Invalid endpoint')
         }
-        const nasaCollection = await axios.get(`${baseUrl}`, axiosConfig);
+        redisClient.hget = util.promisify(redisClient.hget)
+        let nasaCollection;
+        const key = JSON.stringify({
+            key:cacheUtilies.key,
+            source: cacheUtilies.source
+        })
+
+        const cachedData = await redisClient.hget(JSON.stringify(cacheUtilies.hashKey),key);
+
+        if(cachedData){
+            nasaCollection = cachedData
+            return JSON.parse(nasaCollection)
+        }
+        nasaCollection = await axios.get(`${baseUrl}`, axiosConfig);
+        redisClient.hset(JSON.stringify(cacheUtilies.hashKey), key, JSON.stringify(nasaCollection.data),'EX',+process.env.REDIS_CACHE_EXP_TIME);
 
         const nasaData = nasaCollection.data
         return nasaData

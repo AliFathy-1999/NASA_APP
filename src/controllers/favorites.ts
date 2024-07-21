@@ -58,7 +58,8 @@ const getAllFavorites = async (req: Request, res: Response, next: NextFunction) 
         {
             cacheFlag: cacheOption.USE_CACHE,
             hashKey: req.user._id,
-            key: cacheKey
+            key: cacheKey,
+            source: "favorites"
         }
     )
     if (!myFavorites) throw new ApiError(`Failed to get your favorites`, StatusCodes.BAD_REQUEST)
