@@ -48,9 +48,19 @@ const verifyToken = async (bearerToken: string): Promise<IUser | ApiError> => {
     return user;
 };
 
+const orderObject = <T>(unOrderedObject: { [key:string]: any }, keyOrder: Array<string>): T => {
+    const orderedObj: { [key: string]: any } = {};
+    keyOrder.forEach(key => {
+    if (unOrderedObject.hasOwnProperty(key)) {
+        orderedObj[key] = unOrderedObject[key];
+    }
+    });
+    return orderedObj as T;
+}
 
 export {
     generateToken,
     verifyToken,
-    hashText
+    hashText,
+    orderObject
 }

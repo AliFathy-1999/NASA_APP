@@ -1,6 +1,7 @@
 import Redis from 'ioredis'
 import { Query } from 'mongoose';
 import util from 'util';
+import { ICacheParams } from '../interfaces/utils.interface';
 
 
 const redisClient = new Redis({
@@ -16,9 +17,11 @@ redisClient.hget = util.promisify(redisClient.hget)
 const exec = Query.prototype.exec;
 
 //Create a function cache to ensure that only the query data I chose is cached.
-Query.prototype.cache = function (opions: { [key:string] : any } = {} ): Query<any, any> {
+Query.prototype.cache = function (options: ICacheParams = {} ): Query<any, any> {
     this.useCache = true;
-    this.hashKey = JSON.stringify(opions.key || '')
+    this.hashKey = typeof options.hashKey != "string" ? JSON.stringify(options.hashKey || '') : options.hashKey
+    this.key = typeof options.key != "string" ? JSON.stringify(options.key || '') : options.key
+    this.source = typeof options.source != "string" ? JSON.stringify(options.source || '') : options.source
     return this;
 }
 //Cache data when Any exec query happens
@@ -27,21 +30,25 @@ Query.prototype.exec = async function() {
     if(!this.useCache){
         return exec.apply(this,arguments);
     }
-    //Replace callack redisClient.get(()=>{}) with util.promisify
-    redisClient.get = util.promisify(redisClient.get)
-    //Make key unique { _id: '123', collection: "users"} { userId: '123', collection: "posts"} for each model it has a userId
-    const key = JSON.stringify(Object.assign({}, this.getQuery(), {
-        collection: this.mongooseCollection.name
-    }));
 
+    //Replace callack redisClient.get(()=>{}) with util.promisify
+    redisClient.hget = util.promisify(redisClient.hget)
+    //Make key unique { _id: '123', collection: "users"} { userId: '123', collection: "posts"} for each model it has a userId
+    // const key = this.key
+    const key ={
+        key: this.key,
+        source: this.source,
+    };
     // const cachedData = await redisClient.get(key);
     //See if we have a value for key in redis
     // userId: 123 ==> {{ _id: '123', collection: "users"}, { userId: '123', collection: "posts"}}
     //To clear specific user posts not all cached Data
-    const cachedData = await redisClient.hget(this.hashKey,key);
+    // "hashKey" ==> userId && "key" ==> {{ _id: '123', collection: "users"}, { userId: '123', collection: "posts"}}
 
+    const cachedData = await redisClient.hget(this.hashKey,JSON.stringify(key));
+    
     if (cachedData) {
-    console.log('cachedData:', cachedData)
+        console.log('cachedData:', cachedData)
         //JSON.parse(cachedData) ==> plain object not mongoose document  
         //Query.prototype.exec expects to return document not plain object, to convert it to document use new this.model to new instance 
         const doc =  JSON.parse(cachedData);
@@ -50,7 +57,7 @@ Query.prototype.exec = async function() {
                 : new this.model(doc)
     }
     const result = await exec.apply(this);
-    redisClient.hset(this.hashKey, key, JSON.stringify(result),'EX',+process.env.REDIS_CACHE_EXP_TIME);
+    redisClient.hset(this.hashKey, JSON.stringify(key), JSON.stringify(result),'EX',+process.env.REDIS_CACHE_EXP_TIME);
     // redisClient.set(key, JSON.stringify(result),'EX',+process.env.REDIS_CACHE_EXP_TIME);
     return result;
 };

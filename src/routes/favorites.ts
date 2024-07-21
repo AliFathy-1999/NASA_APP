@@ -12,7 +12,9 @@ import clearCacheMW from '../middlewares/clearCache';
 
 const router = Router();
 
-router.post('/', userAuth, validate(favoriteValidator.addFavorite), asyncWrapper(favoritesController.addFavorite))
+router.post('/test', userAuth, clearCacheMW,asyncWrapper(favoritesController.testInsertFavorite))
+
+router.post('/', userAuth, validate(favoriteValidator.addFavorite), clearCacheMW, asyncWrapper(favoritesController.addFavorite))
 router.get('/:id', userAuth, asyncWrapper(favoritesController.getFavoriteById))
 router.get('/', userAuth, asyncWrapper(favoritesController.getAllFavorites))
 router.delete('/:id', userAuth, asyncWrapper(favoritesController.deleteFavoriteItem))

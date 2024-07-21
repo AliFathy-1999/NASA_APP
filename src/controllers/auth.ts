@@ -59,9 +59,7 @@ const logout = async (req:Request, res:Response, next:NextFunction) => {
 
 const register = async (req: Request, res: Response, next: NextFunction) => {  
     
-
         const { firstName, lastName, userName, email, password, role } = req.body;
-
         //Send Email
         const token = hashText(email);
 
