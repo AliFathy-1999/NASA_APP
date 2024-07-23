@@ -10,7 +10,18 @@ const addFavorite = {
         url: Joi.string().required()
     }),
 }
-
+const updateFavorite = {
+    params: Joi.object().keys({
+        id: Joi.string().pattern(/^[a-fA-F0-9]{24}$/).message("Invalid Favorite Id").required()
+    }),
+    body: Joi.object().keys({
+        description: Joi.string().optional(),
+        title: Joi.string().optional(),
+    })
+    .or('description', 'title'),
+    
+}
 export default {
     addFavorite,
+    updateFavorite
 }

@@ -18,11 +18,11 @@ const getModelService = async <T extends Document>(
         const fetchData = new fetchDataUtils(model, { page, limit, sort, select });
         (await fetchData.sort().paginate()).selection();
         //Didn't call cache and call DB 
-        let results 
+        let results = await fetchData.query;
         if(cacheUtilies.cacheFlag === cacheOption.USE_CACHE) { 
             results =  await fetchData.query.cache({ hashKey: cacheUtilies.hashKey, key: cacheUtilies.key, source: cacheUtilies.source});
         }
-        results = await fetchData.query;
+        // results = await fetchData.query;
 
         const data : Ipaginate = {
             page : +fetchData.page,

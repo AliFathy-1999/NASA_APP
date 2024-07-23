@@ -15,8 +15,8 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
     const updatedUser = await userServices.updateUserService(
         {_id:req.user._id},
         { firstName, lastName },
-        );
-        if(updatedUser) infoLogger(`${req.method} | success | ${StatusCodes.OK} | ${req.protocol} | ${req.originalUrl}`)
+    );
+    if(updatedUser) infoLogger(`${req.method} | success | ${StatusCodes.OK} | ${req.protocol} | ${req.originalUrl}`)
 
     res.status(StatusCodes.OK).json({
         status: 'success',
