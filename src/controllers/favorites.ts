@@ -7,7 +7,7 @@ import successMsg from '../utils/messages/successMsg';
 import errorMsg from '../utils/messages/errorMsg';
 import { favoriteServices, userServices } from '../services';
 import commonService from '../services/common-service';
-import { Favorite } from '../DB/models/favorites';
+import { Favorite, favoritesType } from '../DB/models/favorites';
 import { IFavorites } from '../interfaces/favorites';
 import { cacheOption, IUtilies } from '../interfaces/utils.interface';
 
@@ -50,8 +50,7 @@ const getAllFavorites = async (req: Request, res: Response, next: NextFunction) 
         query: { page = 1, limit = 5, sort = "-createdAt", select = '' }
     } = req
     const cacheKey = `data:page:${page}:limit:${limit}:sort:${sort}:select:${select}`
-    // const myFavorites = await favoriteServices.getFavoritesService({ userId: user._id })
-    const myFavorites = await commonService.getModelService<IFavorites>(
+    const myFavorites = await commonService.getModelService<favoritesType>(
         Favorite,
         { userId: user._id },
         { page, limit, sort, select } as IUtilies,
@@ -103,49 +102,26 @@ const deleteFavoriteItem = async (req: Request, res: Response, next: NextFunctio
     })
 }
 
-const testInsertFavorite = async (req: Request, res: Response, next: NextFunction) => {
-    const favorites = [
+const updateFavorite = async (req: Request, res: Response, next: NextFunction) => {
+
+    const { body: { title, description }, params: { id } } = req;
+    console.log('id:', id)
+    
+    console.log('req.user._id:', String(req.user._id))
+    console.log('id :', id )
+    const updatedFavorite = await favoriteServices.updateFavoriteService(
         {
-            "title": "title 11",
-            "description": "description 11",
-            "photographer": "photographer 11",
-            "nasa_id": "nasa_id 11",
-            "url": "url 10",
-            "media_type": "image",
-            "userId": "650c1a70700870e64b5f3b72",
-            "_id": "66891cd8e4a98550a323eae4",
-            "createdAt": "2024-07-06T10:30:48.402Z",
-            "updatedAt": "2024-07-06T10:30:48.402Z"
+            userId: String(req.user._id),
+            _id: id
         },
-        {
-            "title": "title 12",
-            "description": "description 12",
-            "photographer": "photographer 12",
-            "nasa_id": "nasa_id 12",
-            "url": "url 12",
-            "media_type": "image",
-            "userId": "650c1a70700870e64b5f3b72",
-            "_id": "66891d0ee4a98550a323eae7",
-            "createdAt": "2024-07-06T10:31:42.490Z",
-            "updatedAt": "2024-07-06T10:31:42.490Z"
-        },
-        {
-            "title": "title 13",
-            "description": "description 13",
-            "photographer": "photographer 13",
-            "nasa_id": "nasa_id 13",
-            "url": "url 13",
-            "media_type": "image",
-            "userId": "650c1a70700870e64b5f3b72",
-            "_id": "66891d22e4a98550a323eaea",
-            "createdAt": "2024-07-06T10:32:02.061Z",
-            "updatedAt": "2024-07-06T10:32:02.061Z"
-        }
-    ]
-    // const addedFavorites = await Favorite.insertMany(favorites, { ordered: false});
-    // if(!addedFavorites) throw new ApiError('error while adding favorites', 400)
+        { title, description },
+    );
+    if(updatedFavorite) infoLogger(`${req.method} | success | ${StatusCodes.OK} | ${req.protocol} | ${req.originalUrl}`)
+
     res.status(StatusCodes.OK).json({
-        data : favorites
+        status: 'success',
+        message: successMsg.updated('Favorite', `${updatedFavorite.id}`),
+        data : updatedFavorite
     })
 }
 export default {
@@ -153,5 +129,5 @@ export default {
     getFavoriteById,
     getAllFavorites,
     deleteFavoriteItem,
-    testInsertFavorite
+    updateFavorite
 }
