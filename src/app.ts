@@ -4,7 +4,6 @@ import  morgan from 'morgan';
 import helmet from 'helmet';
 import sanitizer from 'express-sanitizer';
 
-import  limiter from './utils/rate-limiter'
 import {ApiError, handleResponseError} from './lib/index'
 
 import router from './routes/index'
@@ -19,7 +18,6 @@ app.use(express.json());
 app.use(cors());
 app.use(morgan('dev'));
 app.use(helmet());
-app.use(limiter);
 app.use(sanitizer());
 
 
