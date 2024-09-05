@@ -37,7 +37,6 @@
     "helmet": "^7.0.0",
     "http-status-codes": "^2.3.0",
     "ioredis": "^5.4.1",
-    "ip": "^2.0.0",
     "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.0",
     "moment": "^2.30.1",
